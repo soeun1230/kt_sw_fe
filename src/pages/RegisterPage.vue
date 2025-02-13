@@ -1,23 +1,25 @@
 <script setup>
 import { ref } from 'vue';
-import api from '../axios.js'
+import api from '../axios.js';
 import { useRouter } from 'vue-router';
-import BaseButton from '../components/LoginButton.vue';
-import BackButton from '../components/RegisterButton.vue';
 
 const router = useRouter();
 const email = ref('');
 const password = ref('');
+const name = ref('');
+const phone = ref('');
 const message = ref('');
 
 const register = async () => {
   try {
     const response = await api.post('http://localhost:8080/api/auth/register', {
       email: email.value,
-      password: password.value
+      password: password.value,
+      name: name.value,
+      phone: phone.value
     });
     message.value = response.data;
-    await router.push('/login');
+    router.push('/login');
   } catch (error) {
     message.value = error.response?.data || "회원가입 실패";
   }
@@ -26,79 +28,116 @@ const register = async () => {
 
 <template>
   <div class="container">
-    <h1 class="title">회원가입</h1>
     <div class="form-container">
-      <input v-model="email" placeholder="이메일" class="input-field" />
-      <input v-model="password" type="password" placeholder="비밀번호" class="input-field" />
-      <BaseButton label="가입하기" :onClick="register" />
-      <BackButton label="메인" :onClick="() => router.push('/')" />
+      <label>Email address</label>
+      <input v-model="email" type="email" class="input-field" />
+
+      <label>Name</label>
+      <input v-model="name" type="text" class="input-field" />
+
+      <label>password</label>
+      <input v-model="password" type="password" class="input-field" />
+
+      <label>Phone Number</label>
+      <input v-model="phone" type="tel" class="input-field" />
+
+      <button class="register-btn" @click="register">회원 가입</button>
+      <button class="back-btn" @click="() => router.push('/')">메인으로</button>
     </div>
     <p class="message">{{ message }}</p>
   </div>
 </template>
 
 <style scoped>
-/* 회원가입 페이지 전체 스타일 */
+html, body, #app {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* 검은 여백 없애고 화면 전체를 채우는 컨테이너 */
 .container {
+  position: absolute; /* 화면 꽉 차게 */
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-color: #f5f5f5;
-  font-family: 'Arial', sans-serif;
+  background-color: #e0e0e0;
+}
+/* 라벨 색상을 블랙으로 설정 */
+.form-container label {
+  color: black;
+  font-size: 1.1rem;
 }
 
-/* 제목 스타일 */
-.title {
-  font-size: 2.5rem;
-  color: #333;
-  margin-bottom: 30px;
-  text-align: center;
-}
-
-/* 폼 컨테이너 스타일 */
+/* 폼 컨테이너 */
 .form-container {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  width: 100%;
-  max-width: 400px;
-  padding: 20px;
+  width: 90%;
+  max-width: 500px;
+  padding: 30px;
   background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* 입력 필드 스타일 */
+/* 입력 필드 */
 .input-field {
-  padding: 12px;
-  font-size: 1.1rem;
-  border: 1px solid #ddd;
+  width: 100%;
+  padding: 14px;
+  font-size: 1.2rem;
+  border: 1px solid #ccc;
   border-radius: 8px;
   outline: none;
-  transition: border-color 0.3s ease;
 }
 
 .input-field:focus {
-  border-color: #4CAF50;
+  border-color: #5733FF;
+}
+
+/* 버튼 스타일 */
+.register-btn {
+  background-color: #5733FF;
+  color: white;
+  border: none;
+  padding: 16px;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.register-btn:hover {
+  background-color: #4529d3;
+}
+
+.back-btn {
+  background-color: white;
+  color: black;
+  border: 2px solid #ccc;
+  padding: 16px;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.back-btn:hover {
+  background-color: #f5f5f5;
 }
 
 /* 메시지 스타일 */
 .message {
   color: #f44336;
-  font-size: 1.1rem;
   text-align: center;
-}
-
-/* 작은 화면에 대한 반응형 디자인 */
-@media (max-width: 600px) {
-  .title {
-    font-size: 2rem;
-  }
-
-  .input-field {
-    font-size: 1rem;
-  }
+  font-size: 1.2rem;
+  margin-top: 15px;
 }
 </style>

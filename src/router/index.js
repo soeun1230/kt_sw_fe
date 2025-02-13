@@ -3,12 +3,16 @@ import HomePage from '@/pages/HomePage.vue';
 import LoginPage from '@/pages/LoginPage.vue';
 import RegisterPage from '@/pages/RegisterPage.vue';
 import DashBoard from "@/pages/DashBoard.vue";
+import UserDetail from "@/pages/UserDetail.vue";
+import MyPet from "@/pages/MyPet.vue";
 
 const routes = [
     { path: '/', component: HomePage },
     { path: '/login', component: LoginPage },
     { path: '/register', component: RegisterPage },
     { path: '/dashboard', component: DashBoard, meta: {requiresAuth: true} },
+    { path: '/user-detail', component: UserDetail, meta: {requiresAuth: true} },
+    { path: '/my-pet', component: MyPet, meta: {requiresAuth: true} },
 ];
 
 const router = createRouter({

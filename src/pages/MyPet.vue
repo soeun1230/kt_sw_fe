@@ -4,23 +4,6 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import LogoutButton from '../components/LoginButton.vue';
 import NavBar from "@/components/NavBar.vue";
-
-const userName = localStorage.getItem("userName");
-const userEmail = localStorage.getItem("userEmail");
-const message = ref("");
-
-const password = ref("");
-const phone = ref("");
-const name = ref("");
-const userId = localStorage.getItem("userId");
-
-// 각 수정할 항목을 처리할 상태 변수
-const editName = ref(false);
-const editPhone = ref(false);
-const editPassword = ref(false);
-
-const router = useRouter();
-
 </script>
 
 <template>
@@ -34,7 +17,6 @@ const router = useRouter();
 </template>
 
 <style scoped>
-/* 전체 화면 레이아웃 설정 */
 html, body, #app {
   width: 100vw;
   height: 100vh;
@@ -67,7 +49,7 @@ html, body, #app {
   justify-content: center;
   align-items: center;
   background-color: #e0e0e0;
-  padding: 20px;
+  padding: 20px; /* 여백 추가 */
 }
 
 </style>
