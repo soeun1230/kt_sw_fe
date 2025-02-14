@@ -10,26 +10,26 @@ const router = useRouter();
 <template>
   <div class="container">
     <div class="form-container">
-      <img src="@/assets/mypetlogo.png" alt="My Pet Logo" class="logo" />
-      <button class="login-btn" @click="() => router.push('/login')">로그인</button>
-      <button class="register-btn" @click="() => router.push('/register')">회원가입</button>
+      <div class="logo-container">
+        <img src="@/assets/mypetlogo.png" alt="My Pet Logo" class="logo" />
+        <h1 class="welcome-text">반려동물과 함께하는 즐거운 시간</h1>
+        <p class="sub-text">나의 소중한 반려동물을 등록하고 관리해보세요</p>
+      </div>
+      <div class="button-container">
+        <button class="login-btn" @click="() => router.push('/login')">
+          <span class="btn-text">로그인</span>
+        </button>
+        <button class="register-btn" @click="() => router.push('/register')">
+          <span class="btn-text">회원가입</span>
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-
-html, body, #app {
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
-/* 검은 여백 없애고 화면 전체를 채우는 컨테이너 */
 .container {
-  position: absolute; /* 화면 꽉 차게 */
+  position: absolute;
   left: 0;
   top: 0;
   width: 100vw;
@@ -37,98 +37,133 @@ html, body, #app {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #e0e0e0;
-}
-/* 라벨 색상을 블랙으로 설정 */
-.form-container label {
-  color: black;
-  font-size: 1.1rem;
+  background: linear-gradient(135deg, #f5f7ff 0%, #e8ecff 100%);
 }
 
-/* 폼 컨테이너 */
 .form-container {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  align-items: center;
+  gap: 2rem;
   width: 90%;
   max-width: 500px;
-  padding: 30px;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  padding: 3rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(87, 51, 255, 0.1);
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s ease;
 }
+
+.form-container:hover {
+  transform: translateY(-5px);
+}
+
+.logo-container {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
 .logo {
-  width: 200px;
+  width: 180px;
   height: auto;
-  margin-bottom: 20px;
-  align-self: center;
+  margin-bottom: 1.5rem;
+  transition: transform 0.3s ease;
 }
 
-/* 입력 필드 */
-.input-field {
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.welcome-text {
+  color: #333;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.sub-text {
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   width: 100%;
-  padding: 14px;
-  font-size: 1.2rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  outline: none;
 }
 
-.input-field:focus {
-  border-color: #5733FF;
-}
-
-/* 버튼 스타일 */
-.register-btn {
-  background-color: #5733FF;
-  color: white;
+.login-btn, .register-btn {
+  width: 100%;
+  padding: 1rem;
   border: none;
-  padding: 16px;
-  font-size: 1.2rem;
-  border-radius: 8px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: bold;
-}
-
-.register-btn:hover {
-  background-color: #4529d3;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .login-btn {
-  background-color: #5733FF;
+  background: #5733FF;
   color: white;
-  border: none;
-  padding: 16px;
-  font-size: 1.2rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
+}
+
+.register-btn {
+  background: white;
+  color: #5733FF;
+  border: 2px solid #5733FF;
+}
+
+.login-btn:hover, .register-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(87, 51, 255, 0.2);
 }
 
 .login-btn:hover {
-  background-color: #4529d3;
+  background: #4529d3;
 }
 
-.back-btn {
-  background-color: white;
-  color: black;
-  border: 2px solid #ccc;
-  padding: 16px;
-  font-size: 1.2rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
+.register-btn:hover {
+  background: #f8f9ff;
 }
 
-.back-btn:hover {
-  background-color: #f5f5f5;
+.btn-text {
+  position: relative;
+  z-index: 1;
 }
 
-/* 메시지 스타일 */
-.message {
-  color: #f44336;
-  text-align: center;
-  font-size: 1.2rem;
-  margin-top: 15px;
+@media (max-width: 480px) {
+  .form-container {
+    padding: 2rem;
+  }
+
+  .welcome-text {
+    font-size: 1.5rem;
+  }
+
+  .sub-text {
+    font-size: 0.9rem;
+  }
+}
+
+/* 애니메이션 효과 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-container {
+  animation: fadeIn 0.8s ease-out;
 }
 </style>

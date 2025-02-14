@@ -29,37 +29,49 @@ const register = async () => {
 <template>
   <div class="container">
     <div class="form-container">
-      <label>Email address</label>
-      <input v-model="email" type="email" class="input-field" />
+      <div class="logo-container">
+        <img src="@/assets/mypetlogo.png" alt="My Pet Logo" class="logo" />
+        <h1 class="welcome-text">환영합니다!</h1>
+        <p class="sub-text">회원가입하고 반려동물과 함께하는 여정을 시작하세요</p>
+      </div>
+      
+      <div class="input-group">
+        <label for="email">이메일</label>
+        <input v-model="email" id="email" type="email" placeholder="이메일을 입력하세요" class="input-field" />
+      </div>
 
-      <label>Name</label>
-      <input v-model="name" type="text" class="input-field" />
+      <div class="input-group">
+        <label for="name">이름</label>
+        <input v-model="name" id="name" type="text" placeholder="이름을 입력하세요" class="input-field" />
+      </div>
 
-      <label>password</label>
-      <input v-model="password" type="password" class="input-field" />
+      <div class="input-group">
+        <label for="password">비밀번호</label>
+        <input v-model="password" id="password" type="password" placeholder="비밀번호를 입력하세요" class="input-field" />
+      </div>
 
-      <label>Phone Number</label>
-      <input v-model="phone" type="tel" class="input-field" />
+      <div class="input-group">
+        <label for="phone">전화번호</label>
+        <input v-model="phone" id="phone" type="tel" placeholder="전화번호를 입력하세요" class="input-field" />
+      </div>
 
-      <button class="register-btn" @click="register">회원 가입</button>
-      <button class="back-btn" @click="() => router.push('/')">메인으로</button>
+      <div class="button-container">
+        <button class="register-btn" @click="register">
+          <span class="btn-text">회원가입</span>
+        </button>
+        <button class="back-btn" @click="() => router.push('/')">
+          <span class="btn-text">메인으로</span>
+        </button>
+      </div>
+      
+      <p v-if="message" :class="['message', message.includes('성공') ? 'success' : 'error']">{{ message }}</p>
     </div>
-    <p class="message">{{ message }}</p>
   </div>
 </template>
 
 <style scoped>
-html, body, #app {
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
-/* 검은 여백 없애고 화면 전체를 채우는 컨테이너 */
 .container {
-  position: absolute; /* 화면 꽉 차게 */
+  position: absolute;
   left: 0;
   top: 0;
   width: 100vw;
@@ -67,77 +79,161 @@ html, body, #app {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #e0e0e0;
-}
-/* 라벨 색상을 블랙으로 설정 */
-.form-container label {
-  color: black;
-  font-size: 1.1rem;
+  background: linear-gradient(135deg, #f5f7ff 0%, #e8ecff 100%);
 }
 
-/* 폼 컨테이너 */
 .form-container {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 1rem;
   width: 90%;
   max-width: 500px;
-  padding: 30px;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(87, 51, 255, 0.1);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.8s ease-out;
 }
 
-/* 입력 필드 */
+.logo-container {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.welcome-text {
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.sub-text {
+  color: #666;
+  font-size: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.input-group label {
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
 .input-field {
   width: 100%;
-  padding: 14px;
-  font-size: 1.2rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  padding: 0.8rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 12px;
   outline: none;
+  transition: all 0.3s ease;
 }
 
 .input-field:focus {
   border-color: #5733FF;
+  box-shadow: 0 0 0 2px rgba(87, 51, 255, 0.1);
 }
 
-/* 버튼 스타일 */
-.register-btn {
-  background-color: #5733FF;
-  color: white;
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+.register-btn, .back-btn {
+  width: 100%;
+  padding: 0.8rem;
   border: none;
-  padding: 16px;
-  font-size: 1.2rem;
-  border-radius: 8px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: bold;
+  transition: all 0.3s ease;
 }
 
-.register-btn:hover {
-  background-color: #4529d3;
+.register-btn {
+  background: #5733FF;
+  color: white;
 }
 
 .back-btn {
-  background-color: white;
-  color: black;
-  border: 2px solid #ccc;
-  padding: 16px;
-  font-size: 1.2rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
+  background: white;
+  color: #5733FF;
+  border: 2px solid #5733FF;
+}
+
+.register-btn:hover, .back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(87, 51, 255, 0.2);
+}
+
+.register-btn:hover {
+  background: #4529d3;
 }
 
 .back-btn:hover {
-  background-color: #f5f5f5;
+  background: #f8f9ff;
 }
 
-/* 메시지 스타일 */
 .message {
-  color: #f44336;
   text-align: center;
-  font-size: 1.2rem;
-  margin-top: 15px;
+  padding: 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+.message.error {
+  background: #fff3f3;
+  color: #d32f2f;
+}
+
+.message.success {
+  background: #f0fff4;
+  color: #2e7d32;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .form-container {
+    padding: 2rem;
+  }
+
+  .welcome-text {
+    font-size: 1.5rem;
+  }
+
+  .sub-text {
+    font-size: 0.9rem;
+  }
 }
 </style>

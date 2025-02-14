@@ -23,6 +23,9 @@ const login = async () => {
     localStorage.setItem('userEmail', response.data.email);
     localStorage.setItem('userPhone', response.data.phone);
     localStorage.setItem('userId', response.data.userId);
+    localStorage.setItem('userCode', response.data.userCode);
+    localStorage.setItem('petSitterId', response.data.petSitterId);
+
 
     message.value = "로그인 성공!";
     await router.push('/dashboard');
@@ -35,31 +38,39 @@ const login = async () => {
 <template>
   <div class="container">
     <div class="form-container">
-<!--      <img src="@/assets/mypetlogo.png" alt="My Pet Logo" class="logo" />-->
-      <label for="email">Email address</label>
-      <input v-model="email" id="email" placeholder="이메일" class="input-field" />
+      <div class="logo-container">
+        <img src="@/assets/mypetlogo.png" alt="My Pet Logo" class="logo" />
+        <h1 class="welcome-text">다시 만나서 반가워요!</h1>
+        <p class="sub-text">로그인하고 반려동물을 관리해보세요</p>
+      </div>
+      
+      <div class="input-group">
+        <label for="email">이메일</label>
+        <input v-model="email" id="email" type="email" placeholder="이메일을 입력하세요" class="input-field" />
+      </div>
 
-      <label for="password">Password</label>
-      <input v-model="password" id="password" type="password" placeholder="비밀번호" class="input-field" />
-      <button class="login-btn" @click="login" >로그인</button>
-      <button class="back-btn" @click="() => router.push('/')">메인으로</button>
+      <div class="input-group">
+        <label for="password">비밀번호</label>
+        <input v-model="password" id="password" type="password" placeholder="비밀번호를 입력하세요" class="input-field" />
+      </div>
+
+      <div class="button-container">
+        <button class="login-btn" @click="login">
+          <span class="btn-text">로그인</span>
+        </button>
+        <button class="back-btn" @click="() => router.push('/')">
+          <span class="btn-text">메인으로</span>
+        </button>
+      </div>
+      
+      <p v-if="message" :class="['message', message.includes('성공') ? 'success' : 'error']">{{ message }}</p>
     </div>
-    <p class="message">{{ message }}</p>
   </div>
 </template>
 
 <style scoped>
-html, body, #app {
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
-/* 검은 여백 없애고 화면 전체를 채우는 컨테이너 */
 .container {
-  position: absolute; /* 화면 꽉 차게 */
+  position: absolute;
   left: 0;
   top: 0;
   width: 100vw;
@@ -67,87 +78,157 @@ html, body, #app {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #e0e0e0;
-}
-
-.logo {
-  width: 200px;
-  height: auto;
-  margin-bottom: 20px;
-  align-self: center;
-}
-
-.title {
-  font-size: 2.5rem;
-  color: #333;
-  margin-bottom: 30px;
-  text-align: center;
+  background: linear-gradient(135deg, #f5f7ff 0%, #e8ecff 100%);
 }
 
 .form-container {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 1.5rem;
   width: 90%;
   max-width: 500px;
-  padding: 30px;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  padding: 3rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(87, 51, 255, 0.1);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.8s ease-out;
 }
 
-label {
+.logo-container {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.logo {
+  width: 150px;
+  height: auto;
+  margin-bottom: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.welcome-text {
+  color: #333;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.sub-text {
+  color: #666;
   font-size: 1rem;
-  font-weight: bold;
-  color: black;
+  margin-bottom: 1rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group label {
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .input-field {
-  padding: 12px;
-  font-size: 1.1rem;
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
   border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: 12px;
   outline: none;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .input-field:focus {
-  border-color: #5733FF
+  border-color: #5733FF;
+  box-shadow: 0 0 0 2px rgba(87, 51, 255, 0.1);
 }
 
-.message {
-  color: #f44336;
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.login-btn, .back-btn {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 12px;
   font-size: 1.1rem;
-  text-align: center;
-}
-
-.back-btn {
-  background-color: white;
-  color: black;
-  border: 2px solid #ccc;
-  padding: 16px;
-  font-size: 1.2rem;
-  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: bold;
-}
-
-.back-btn:hover {
-  background-color: #f5f5f5;
+  transition: all 0.3s ease;
 }
 
 .login-btn {
-  background-color: #5733FF;
+  background: #5733FF;
   color: white;
-  border: none;
-  padding: 16px;
-  font-size: 1.2rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
+}
+
+.back-btn {
+  background: white;
+  color: #5733FF;
+  border: 2px solid #5733FF;
+}
+
+.login-btn:hover, .back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(87, 51, 255, 0.2);
 }
 
 .login-btn:hover {
-  background-color: #4529d3;
+  background: #4529d3;
+}
+
+.back-btn:hover {
+  background: #f8f9ff;
+}
+
+.message {
+  text-align: center;
+  padding: 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+.message.error {
+  background: #fff3f3;
+  color: #d32f2f;
+}
+
+.message.success {
+  background: #f0fff4;
+  color: #2e7d32;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .form-container {
+    padding: 2rem;
+  }
+
+  .welcome-text {
+    font-size: 1.5rem;
+  }
+
+  .sub-text {
+    font-size: 0.9rem;
+  }
 }
 </style>

@@ -5,6 +5,8 @@ import RegisterPage from '@/pages/RegisterPage.vue';
 import DashBoard from "@/pages/DashBoard.vue";
 import UserDetail from "@/pages/UserDetail.vue";
 import MyPet from "@/pages/MyPet.vue";
+import PetSitterRegister from '@/pages/PetSitterRegister.vue';
+import PetSitter from '@/pages/PetSitter.vue';
 
 const routes = [
     { path: '/', component: HomePage },
@@ -13,6 +15,8 @@ const routes = [
     { path: '/dashboard', component: DashBoard, meta: {requiresAuth: true} },
     { path: '/user-detail', component: UserDetail, meta: {requiresAuth: true} },
     { path: '/my-pet', component: MyPet, meta: {requiresAuth: true} },
+    { path: '/pet-sitter-register', component: PetSitterRegister, meta: {requiresAuth: true} },
+    { path: '/pet-sitter', component: PetSitter, meta: {requiresAuth: true} },
 ];
 
 const router = createRouter({

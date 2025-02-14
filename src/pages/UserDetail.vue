@@ -183,61 +183,47 @@ html, body, #app {
   padding: 0 20px;
 }
 
-.profile-card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  max-width: 400px;
-  text-align: center;
-}
-
+/* 배경 스타일만 Homepage와 통일 */
 .container {
   position: absolute;
   left: 0;
   top: 0;
-  width: 100vw; /* 너비 100% */
-  height: 100vh; /* 높이 100% */
+  width: 100vw;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #e0e0e0;
-  padding: 20px; /* 여백 추가 */
+  background: linear-gradient(135deg, #f5f7ff 0%, #e8ecff 100%);
+  padding-top: 60px;
 }
 
+/* 폼 스타일만 Homepage와 통일 */
 .profile-card {
-  background: #fff;
-  padding: 30px; /* 내용물에 여유를 주기 위한 패딩 */
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 500px; /* 카드 크기 조정 */
-  width: 100%; /* 가로 100% */
-  text-align: center;
+  width: 90%;
+  max-width: 500px;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(87, 51, 255, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 /* 수정된 user-info와 user-edit 컨테이너 */
-.user-info{
+.user-info {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 2rem;  /* 간격 늘림 */
   width: 100%;
+  margin-bottom: 2rem;  /* 하단 여백 추가 */
 }
-.modal-content-2{
-  color: black;
-}
+
 .user-details, .user-edit {
-  background-color: #f9f9f9; /* 부드러운 배경색 */
-  border: 1px solid #ddd; /* 부드러운 회색 테두리 */
-  border-radius: 10px; /* 둥근 모서리 */
-  padding: 20px; /* 내용과 테두리 사이의 여백 */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 가벼운 그림자 */
-  text-align: left; /* 텍스트 왼쪽 정렬 */
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 2rem;  /* 패딩 늘림 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: left;
 }
 
 .user-info-item {
@@ -257,11 +243,19 @@ html, body, #app {
 }
 
 .input-field {
-  margin: 10px 0;
-  padding: 10px;
+  margin: 1.5rem 0;
+  padding: 1rem;
   width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.input-field:focus {
+  border-color: #5733FF;
+  box-shadow: 0 0 0 2px rgba(87, 51, 255, 0.1);
+  outline: none;
 }
 
 .update-btn {
@@ -297,52 +291,60 @@ html, body, #app {
 
 /* Modal styles */
 .modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: absolute;  /* fixed에서 absolute로 변경 */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);  /* 정중앙 배치 */
+  width: 90%;
+  max-width: 400px;
   z-index: 2000;
 }
 
 .modal-content {
   background-color: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
-  width: 100%;
+  padding: 2rem;
+  border-radius: 24px;
+  width: 100%;  /* 90%에서 100%로 변경 */
+  box-shadow: 0 10px 30px rgba(87, 51, 255, 0.2);
+}
+
+.modal-content-2 {
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
   text-align: center;
 }
 
+.ok-btn, .cancel-btn {
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
 .ok-btn {
-  margin-top: 20px;
-  padding: 10px;
-  background-color: #539353;
+  background-color: #5733FF;
   color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  width: 100%;
 }
+
 .ok-btn:hover {
-  background-color: green;
+  background-color: #4529d3;
+  transform: translateY(-2px);
 }
+
 .cancel-btn {
-  margin-top: 20px;
-  padding: 10px;
-  background-color: #d67f7f;
-  color: black;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  width: 100%;
+  background-color: #f8f9fa;
+  color: #666;
+  border: 1px solid #ddd;
 }
+
 .cancel-btn:hover {
-  background-color: #d67474;
+  background-color: #e9ecef;
+  transform: translateY(-2px);
 }
 </style>

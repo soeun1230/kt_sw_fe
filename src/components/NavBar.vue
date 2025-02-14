@@ -1,6 +1,6 @@
 <script setup>
 import api from "../axios.js"
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { handleLogout } from '../axios.js';
 
@@ -10,8 +10,20 @@ function logout() {
 
 const userName = localStorage.getItem("userName");
 const userEmail = localStorage.getItem("userEmail");
+const userCode = localStorage.getItem("userCode");
 const message = ref("");
 const router = useRouter();
+
+// 사용자 코드 가져오기
+const fetchUserCode = async () => {
+  try {
+    const userId = localStorage.getItem('userId');
+    const response = await api.get(`http://localhost:8080/api/users/code/${userId}`);
+    localStorage.setItem('userCode', response.data.userCode); // 응답으로 받은 userCode를 localStorage에 저장
+  } catch (error) {
+    console.error("사용자 코드 조회 실패:", error);
+  }
+};
 
 const goToUserDetail = () => {
   router.push('/user-detail'); // 마이펫 페이지로 이동
@@ -25,6 +37,15 @@ const goToDashboard = () => {
   router.push('/dashboard');
 }
 
+const goToPetSitterRegister = () => {
+  router.push('/pet-sitter-register');
+}
+
+const goToPetSitterPage = () => {
+  router.push('/pet-sitter'); // 펫시터 페이지로 이동
+}
+
+onMounted(fetchUserCode);
 </script>
 
 <template>
@@ -41,11 +62,14 @@ const goToDashboard = () => {
     <div class="nav-menu">
       <span class="menu-item" @click="goToDashboard">메인</span>
       <span class="menu-item" @click="goToMyPet">마이펫</span>
+      <!-- userCode에 따라 다른 버튼 표시 -->
+      <span v-if="userCode === '0'" class="menu-item" @click="goToPetSitterRegister">펫시터 등록</span>
+      <span v-else-if="userCode === '1'" class="menu-item" @click="goToPetSitterPage">펫시터 페이지</span>
     </div>
 
-    <!-- 오른쪽: 로그아웃 & 회원탈퇴 버튼 -->
+    <!-- 오른쪽: 로그아웃 버튼 -->
     <div class="buttons">
-      <button class="logout-btn" @click="logout"> 로그아웃 </button>
+      <button class="logout-btn" @click="logout">로그아웃</button>
     </div>
   </nav>
 </template>

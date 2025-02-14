@@ -5,22 +5,7 @@ import { useRouter } from 'vue-router';
 import LogoutButton from '../components/LoginButton.vue';
 import NavBar from "@/components/NavBar.vue";
 
-const userName = localStorage.getItem("userName");
-const userEmail = localStorage.getItem("userEmail");
-const message = ref("");
-
-const password = ref("");
-const phone = ref("");
-const name = ref("");
-const userId = localStorage.getItem("userId");
-
-// 각 수정할 항목을 처리할 상태 변수
-const editName = ref(false);
-const editPhone = ref(false);
-const editPassword = ref(false);
-
 const router = useRouter();
-
 </script>
 
 <template>
@@ -61,13 +46,12 @@ html, body, #app {
   position: absolute;
   left: 0;
   top: 0;
-  width: 100vw; /* 너비 100% */
-  height: 100vh; /* 높이 100% */
+  width: 100vw;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #e0e0e0;
-  padding: 20px;
+  background: linear-gradient(135deg, #f5f7ff 0%, #e8ecff 100%);
+  padding-top: 60px;
 }
-
 </style>
