@@ -1,19 +1,27 @@
-//전체 펫시터 목록을 보여주고, 한 사람을 눌러서 걔한테 신청하기 버튼을 만들어주기
-//이때 자기자신이 펫시터인 경우 자기자신은 빼고 보여주기 
-//그러면 그 친구의 상세페이지에 예약 목록이 뜨고 허락하기 누르게 하기 
-//그러면 petsserviceforuser에 확정 예약으로 넘어가기 
-//그전에는 예약 대기에 머물러 있기 
-//펫시터도 마찬가지 
-
 <script setup>
 import NavBar from "@/components/NavBar.vue";
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import api from "../axios.js";
 
 const petSitters = ref([]);
 const selectedSitter = ref(null);
 const showModal = ref(false);
 const message = ref('');
+
+const serviceRequest = ref({
+    userId: localStorage.getItem('userId'),
+    petSitterId: null,
+    date: '',
+    petKind: '',
+    cost: null,
+    status: 0,
+    hours: 1  // 시간 입력 필드 추가
+});
+
+const calculateTotalCost = computed(() => {
+    if (!selectedSitter.value || !serviceRequest.value.hours) return 0;
+    return selectedSitter.value.costPerHour * serviceRequest.value.hours;
+});
 
 // base64 변환 함수
 const arrayBufferToBase64 = (buffer) => {
@@ -34,6 +42,7 @@ const fetchPetSitters = async () => {
     try {
         const userId = localStorage.getItem('userId');
         const response = await api.get(`http://localhost:8080/api/users/petsitters/all/${userId}`);
+        console.log('Fetched sitters:', response.data); // 데이터 확인용 로그
         petSitters.value = response.data.sitters;
     } catch (error) {
         console.error('Error fetching pet sitters:', error);
@@ -42,8 +51,46 @@ const fetchPetSitters = async () => {
 };
 
 const openSitterDetail = (sitter) => {
+    console.log('Selected sitter:', sitter);
+    console.log('Possible pets:', sitter.possiblePet);
     selectedSitter.value = sitter;
     showModal.value = true;
+    
+    serviceRequest.value = {
+        userId: localStorage.getItem('userId'),
+        petSitterId: sitter.userId,
+        date: '',
+        petKind: '',
+        cost: sitter.costPerHour,
+        status: 0,
+        hours: 1
+    };
+};
+
+const submitServiceRequest = async (sitter) => {
+    try {
+        serviceRequest.value.petSitterId = sitter.userId;
+        serviceRequest.value.cost = calculateTotalCost.value;  // 계산된 총 비용 설정
+
+        const response = await api.post('http://localhost:8080/api/users/services', serviceRequest.value);
+        
+        if (response.data.message === 'added') {
+            alert('서비스 신청이 완료되었습니다.');
+            showModal.value = false;
+            serviceRequest.value = {  // 폼 초기화
+                userId: localStorage.getItem('userId'),
+                petSitterId: null,
+                date: '',
+                petKind: '',
+                cost: null,
+                status: 0,
+                hours: 1
+            };
+        }
+    } catch (error) {
+        console.error('Error submitting service request:', error);
+        alert('서비스 신청에 실패했습니다.');
+    }
 };
 
 onMounted(fetchPetSitters);
@@ -125,6 +172,58 @@ onMounted(fetchPetSitters);
                                 <p>{{ selectedSitter.workExp }}</p>
                             </div>
                         </div>
+
+                        <!-- 서비스 신청 폼 추가 -->
+                        <div class="service-request-form">
+                            <h3>서비스 신청</h3>
+                            <div class="form-group">
+                                <label>날짜 선택</label>
+                                <input 
+                                    type="date" 
+                                    v-model="serviceRequest.date"
+                                    class="input-field"
+                                    required
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label>반려동물 종류</label>
+                                <select 
+                                    v-model="serviceRequest.petKind"
+                                    class="input-field"
+                                    required
+                                >
+                                    <option value="">선택해주세요</option>
+                                    <option v-for="pet in selectedSitter.possiblePet" 
+                                            :key="pet" 
+                                            :value="pet">
+                                        {{ pet }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>이용 시간 (시간)</label>
+                                <input 
+                                    type="number" 
+                                    v-model.number="serviceRequest.hours"
+                                    min="1"
+                                    class="input-field"
+                                    required
+                                />
+                            </div>
+                            <div class="cost-info">
+                                <p class="hourly-rate">시간당 비용: {{ selectedSitter.costPerHour }}원</p>
+                                <p class="total-cost">총 비용: {{ calculateTotalCost }}원 
+                                    <span class="cost-detail">({{ serviceRequest.hours }}시간)</span>
+                                </p>
+                            </div>
+                            <button 
+                                @click="submitServiceRequest(selectedSitter)"
+                                class="submit-btn"
+                                :disabled="!serviceRequest.date || !serviceRequest.petKind || !serviceRequest.hours"
+                            >
+                                서비스 신청하기
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -143,19 +242,6 @@ html, body, #app {
   overflow: hidden;
 }
 
-/* 헤더 스타일 */
-.page-header {
-  position: fixed; /* 상단 고정 */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 60px; /* 네비바 높이 */
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-  z-index: 1000; /* 다른 요소 위에 표시 */
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-}
 
 .container {
     position: absolute;
@@ -369,6 +455,108 @@ h1 {
         align-items: center;
         text-align: center;
     }
+}
+
+.service-request-form {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
+}
+
+.service-request-form h3 {
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.input-field {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.cost-info {
+    margin: 1rem 0;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.cost-info p {
+    color: #5733FF;
+    font-weight: 600;
+    margin: 0.5rem 0;
+}
+
+.hourly-rate {
+    font-size: 0.9rem;
+    color: #666 !important;
+}
+
+.total-cost {
+    font-size: 1.2rem;
+}
+
+.cost-detail {
+    font-size: 0.9rem;
+    color: #666;
+    margin-left: 0.5rem;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: #5733FF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background: #4529d3;
+    transform: translateY(-2px);
+}
+
+.submit-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.input-field:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+/* 선택 불가능한 옵션에 대한 스타일 */
+select option:disabled {
+    color: #999;
+    background-color: #f5f5f5;
 }
 </style>
 

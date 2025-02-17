@@ -338,18 +338,7 @@ html, body, #app {
   background-color: #f5f5f5;
 }
 
-.page-header {
-  position: fixed; /* 상단 고정 */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 60px; /* 네비바 높이 */
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-  z-index: 1000; /* 다른 요소 위에 표시 */
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-}
+
 
 .main-content {
   width: 100%;

@@ -10,6 +10,7 @@ import PetSitter from '@/pages/PetSitter.vue';
 import PetSitterServiceRegister from '@/pages/PetSitterServiceRegister.vue';
 import PetSitterServiceForUser from '@/pages/PetSitterServiceForUser.vue';
 import ManagerPage from '@/pages/ManagerPage.vue';
+import PetSitterServiceForPetSitter from '@/pages/PetSitterServiceForPetSitter.vue';
 
 const routes = [
     { path: '/', component: HomePage },
@@ -22,6 +23,7 @@ const routes = [
     { path: '/pet-sitter', component: PetSitter, meta: {requiresAuth: true} },
     { path: '/pet-sitter-service-register', component: PetSitterServiceRegister, meta: {requiresAuth: true} },
     { path: '/pet-sitter-service-for-user', component: PetSitterServiceForUser, meta: {requiresAuth: true} },
+    { path: '/pet-sitter-service-for-pet-sitter', component: PetSitterServiceForPetSitter, meta: {requiresAuth: true} },
     { path: '/manager', component: ManagerPage },
 ];
 

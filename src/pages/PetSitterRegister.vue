@@ -338,31 +338,18 @@ const registerPetSitter = async () => {
   overflow: hidden;
 }
 
-/* 헤더 스타일 */
-.page-header {
-  position: fixed; /* 상단 고정 */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 60px; /* 네비바 높이 */
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-  z-index: 1000; /* 다른 요소 위에 표시 */
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-}
 
 .container {
     position: absolute;
     left: 0;
-    top: 60px;  /* header 높이만큼 띄우기 */
+    top: 60px;
     width: 100vw;
-    min-height: calc(100vh - 60px);  /* 최소 높이 설정 */
+    min-height: calc(100vh - 60px);
     display: flex;
     justify-content: center;
     align-items: center;
     background: linear-gradient(135deg, #f5f7ff 0%, #e8ecff 100%);
-    padding: 40px;  /* 패딩 증가 */
+    padding: 40px;
 }
 
 .register-form {

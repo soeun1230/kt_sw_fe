@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import NavBar from "@/components/NavBar.vue";
-import PaymentTest from "@/components/PaymentTest.vue";
 import api from "../axios.js";
 
 const services = ref({
@@ -12,31 +11,26 @@ const services = ref({
 const fetchServices = async () => {
     try {
         const userId = localStorage.getItem('userId');
-        const response = await api.get(`http://localhost:8080/api/users/services/${userId}`);
-        console.log('서비스 데이터:', response.data); // 데이터 확인용
-        
-        if (response.data) {
-            services.value = {
-                registered: response.data.registered || [],
-                notRegistered: response.data.notRegistered || []
-            };
-        }
+        const response = await api.get(`http://localhost:8080/api/petsitters/services/${userId}`);
+        services.value = response.data;
     } catch (error) {
         console.error('Error fetching services:', error);
     }
 };
 
-// 결제 성공 후 상태 업데이트 함수
-const updatePaymentStatus = async (serviceId) => {
+// 예약 승인 함수 추가
+const approveService = async (serviceId) => {
     try {
-        const response = await api.patch(`http://localhost:8080/api/users/services/payment/${serviceId}`);
-        if (response.data && response.data.message === 'pay') {
-            alert('결제가 완료되었습니다.');
-            await fetchServices(); // 목록 새로고침
+        const response = await api.get(`http://localhost:8080/api/petsitters/services/allow/${serviceId}`);
+        
+        if (response.data) {
+            alert('예약이 승인되었습니다.');
+            // 목록 새로고침
+            await fetchServices();
         }
     } catch (error) {
-        console.error('Payment status update failed:', error);
-        alert('결제 상태 업데이트에 실패했습니다.');
+        console.error('Error approving service:', error);
+        alert('예약 승인에 실패했습니다.');
     }
 };
 
@@ -51,13 +45,13 @@ onMounted(fetchServices);
     <div class="container">
         <div class="form-container">
             <div class="logo-container">
-                <h1 class="welcome-text">나의 펫시터 서비스 예약</h1>
-                <p class="sub-text">예약 현황을 확인해보세요</p>
+                <h1 class="welcome-text">펫시터 서비스 예약 관리</h1>
+                <p class="sub-text">예약 요청과 확정된 예약을 관리하세요</p>
             </div>
 
-            <!-- 예약 대기 중인 서비스 -->
+            <!-- 승인 대기 중인 서비스 -->
             <div class="service-section">
-                <h2>대기 중인 예약</h2>
+                <h2>승인 대기 중인 예약</h2>
                 <div class="service-grid" v-if="services.notRegistered.length > 0">
                     <div v-for="service in services.notRegistered" 
                          :key="service.serviceId" 
@@ -67,10 +61,16 @@ onMounted(fetchServices);
                             <p class="date">예약 날짜: {{ service.date }}</p>
                             <p class="pet-type">반려동물: {{ service.petKind }}</p>
                             <p class="cost">비용: {{ service.cost }}원</p>
+                            <button 
+                                class="approve-btn" 
+                                @click="approveService(service.serviceId)"
+                            >
+                                예약 승인하기
+                            </button>
                         </div>
                     </div>
                 </div>
-                <p v-else class="no-service">대기 중인 예약이 없습니다.</p>
+                <p v-else class="no-service">승인 대기 중인 예약이 없습니다.</p>
             </div>
 
             <!-- 확정된 서비스 -->
@@ -85,13 +85,6 @@ onMounted(fetchServices);
                             <p class="date">예약 날짜: {{ service.date }}</p>
                             <p class="pet-type">반려동물: {{ service.petKind }}</p>
                             <p class="cost">비용: {{ service.cost }}원</p>
-                            <div v-if="!service.paymentStatus" class="payment-section">
-                                <PaymentTest 
-                                    :amount="service.cost"
-                                    @payment-success="updatePaymentStatus(service.serviceId)" 
-                                />
-                            </div>
-                            <p v-else class="payment-complete">결제 완료</p>
                         </div>
                     </div>
                 </div>
@@ -102,7 +95,6 @@ onMounted(fetchServices);
 </template>
 
 <style scoped>
-/* 헤더 스타일 추가 */
 
 
 /* container 위치 조정 */
@@ -222,20 +214,6 @@ onMounted(fetchServices);
     border-radius: 12px;
 }
 
-.payment-section {
-    margin-top: 1rem;
-}
-
-.payment-complete {
-    text-align: center;
-    color: #4caf50;
-    font-weight: 600;
-    margin-top: 1rem;
-    padding: 0.5rem;
-    background: #e8f5e9;
-    border-radius: 8px;
-}
-
 @media (max-width: 768px) {
     .form-container {
         padding: 2rem;
@@ -248,5 +226,25 @@ onMounted(fetchServices);
     .service-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* 승인 버튼 추가 스타일 */
+.approve-btn {
+    width: 100%;
+    padding: 0.8rem;
+    background: #5733FF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.approve-btn:hover {
+    background: #4529d3;
+    transform: translateY(-2px);
 }
 </style>

@@ -5,7 +5,7 @@ const router = useRouter();
 
 // axios 인스턴스 생성
 const api = axios.create({
-    baseURL: 'http://localhost:8080/api', // 기본 URL
+    baseURL: 'http://localhost:8080',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -16,10 +16,10 @@ let isRefreshing = false
 
 // 요청 인터셉터: 요청 전에 액세스 토큰을 헤더에 추가
 api.interceptors.request.use(
-    async (config) => {
-        const accessToken = localStorage.getItem('access_token');
-        if (accessToken) {
-            config.headers['Authorization'] = `Bearer ${accessToken}`;
+    (config) => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
     },
@@ -94,7 +94,5 @@ export function handleLogout() {
 
     window.location.href = '/login';
 }
-
-
 
 export default api;

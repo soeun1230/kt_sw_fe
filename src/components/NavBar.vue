@@ -10,7 +10,7 @@ function logout() {
 
 const userName = localStorage.getItem("userName");
 const userEmail = localStorage.getItem("userEmail");
-const userCode = localStorage.getItem("userCode");
+const userCode = ref(localStorage.getItem("userCode"));
 const message = ref("");
 const router = useRouter();
 
@@ -53,7 +53,16 @@ const goToPetSitterServiceForUser = () => {
   router.push('/pet-sitter-service-for-user');
 }
 
+const goToPetSitterServiceForPetSitter = () => {
+  router.push('/pet-sitter-service-for-pet-sitter');
+}
+
 onMounted(fetchUserCode);
+
+// userCode가 변경될 때마다 업데이트
+onMounted(() => {
+    userCode.value = localStorage.getItem('userCode');
+});
 </script>
 
 <template>
@@ -76,6 +85,9 @@ onMounted(fetchUserCode);
       <!-- userCode에 따라 다른 버튼 표시 -->
       <span v-if="userCode === '0'" class="menu-item" @click="goToPetSitterRegister">펫시터 등록</span>
       <span v-else-if="userCode === '1'" class="menu-item" @click="goToPetSitterPage">펫시터 페이지</span>
+
+      <!-- 펫시터인 경우에만 보이는 메뉴 -->
+      <span v-if="userCode === '1'" class="menu-item" @click="goToPetSitterServiceForPetSitter">펫시터 예약 관리</span>
     </div>
 
     <!-- 오른쪽: 로그아웃 버튼 -->

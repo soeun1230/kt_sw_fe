@@ -1,6 +1,6 @@
 <script setup>
 import NavBar from "@/components/NavBar.vue";
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import api from "../axios.js";
 import { useRouter } from 'vue-router';
 
@@ -8,7 +8,8 @@ const codes = ref({
     codeTypes: [],
     petKindCodes: [],
     petSizeCodes: [],
-    userStatusCodes: []
+    userStatusCodes: [],
+    plusCodes: []
 });
 
 const newCodeGroup = ref({
@@ -35,6 +36,13 @@ const newUserStatus = ref({
     codeExp: '',
     codeGroup: '',
     userStatus: ''
+});
+
+const newPlusCode = ref({
+    codeGroup: '',
+    code: null,
+    codeExp: '',
+    type: ''
 });
 
 const message = ref('');
@@ -83,6 +91,82 @@ const sortedUserStatusCodes = computed(() => {
     });
 });
 
+const sortedPlusCodes = computed(() => {
+    if (!codes.value.plusCodes) return [];
+    return [...codes.value.plusCodes].sort((a, b) => {
+        // 먼저 codeGroup으로 비교
+        const groupA = parseInt(a.codeGroup);
+        const groupB = parseInt(b.codeGroup);
+        
+        if (groupA !== groupB) {
+            return groupA - groupB;  // codeGroup이 다르면 이걸로 정렬
+        }
+        
+        // codeGroup이 같으면 code로 비교
+        const codeA = parseInt(a.code);
+        const codeB = parseInt(b.code);
+        return codeA - codeB;
+    });
+});
+
+// 페이지네이션 상태 추가
+const currentPage = ref({
+    codeTypes: 1,
+    petKind: 1,
+    petSize: 1,
+    userStatus: 1,
+    plusCode: 1
+});
+
+const itemsPerPage = 5; // 페이지당 항목 수
+
+// 페이지네이션된 데이터를 반환하는 computed 속성들
+const paginatedCodeTypes = computed(() => {
+    const start = (currentPage.value.codeTypes - 1) * itemsPerPage;
+    return sortedCodeTypes.value.slice(start, start + itemsPerPage);
+});
+
+const paginatedPetKindCodes = computed(() => {
+    const start = (currentPage.value.petKind - 1) * itemsPerPage;
+    return sortedPetKindCodes.value.slice(start, start + itemsPerPage);
+});
+
+const paginatedPetSizeCodes = computed(() => {
+    const start = (currentPage.value.petSize - 1) * itemsPerPage;
+    return sortedPetSizeCodes.value.slice(start, start + itemsPerPage);
+});
+
+const paginatedUserStatusCodes = computed(() => {
+    const start = (currentPage.value.userStatus - 1) * itemsPerPage;
+    return sortedUserStatusCodes.value.slice(start, start + itemsPerPage);
+});
+
+const paginatedPlusCodes = computed(() => {
+    const start = (currentPage.value.plusCode - 1) * itemsPerPage;
+    return sortedPlusCodes.value.slice(start, start + itemsPerPage);
+});
+
+// 총 페이지 수를 계산하는 computed 속성들
+const totalPages = computed(() => ({
+    codeTypes: Math.ceil(sortedCodeTypes.value.length / itemsPerPage),
+    petKind: Math.ceil(sortedPetKindCodes.value.length / itemsPerPage),
+    petSize: Math.ceil(sortedPetSizeCodes.value.length / itemsPerPage),
+    userStatus: Math.ceil(sortedUserStatusCodes.value.length / itemsPerPage),
+    plusCode: Math.ceil(sortedPlusCodes.value.length / itemsPerPage)
+}));
+
+// 페이지 변경 함수
+const changePage = (tab, page) => {
+    currentPage.value[tab] = page;
+};
+
+// 탭 변경 시 페이지 초기화
+watch(activeTab, (newTab) => {
+    Object.keys(currentPage.value).forEach(key => {
+        currentPage.value[key] = 1;
+    });
+});
+
 // 메시지를 설정하고 자동으로 사라지게 하는 함수
 const setMessage = (msg) => {
     message.value = msg;
@@ -92,10 +176,9 @@ const setMessage = (msg) => {
         clearTimeout(messageTimer);
     }
     
-    // 3초 후에 메시지 제거
     messageTimer = setTimeout(() => {
         message.value = '';
-    }, 3000);
+    }, 1000);
 };
 
 const fetchCodes = async () => {
@@ -108,7 +191,8 @@ const fetchCodes = async () => {
             codeTypes: response.data.codeTypes || [],
             petKindCodes: response.data.petKindCodes || [],
             petSizeCodes: response.data.petSizeCodes || [],
-            userStatusCodes: response.data.userStatusCodes || []
+            userStatusCodes: response.data.userStatusCodes || [],
+            plusCodes: response.data.plusCodes || []
         };
     } catch (error) {
         console.error('Error fetching codes:', error);
@@ -220,6 +304,20 @@ const addUserStatus = async () => {
     }
 };
 
+const addPlusCode = async () => {
+    try {
+        const response = await api.post('/api/manager/codes/pluscode', newPlusCode.value);
+        if (response.data) {
+            setMessage("기타 코드가 추가되었습니다.");
+            await fetchCodes();
+            resetForm('plusCode');
+        }
+    } catch (error) {
+        console.error('Error adding plus code:', error);
+        setMessage("기타 코드 추가에 실패했습니다.");
+    }
+};
+
 const deleteCodeGroup = async (codeGroup) => {
     try {
         const response = await api.patch(`http://localhost:8080/api/manager/codes/group/delete/${codeGroup}`);
@@ -272,6 +370,21 @@ const deleteUserStatus = async (code) => {
     }
 };
 
+const deletePlusCode = async (code) => {
+    if (confirm('정말 삭제하시겠습니까?')) {
+        try {
+            const response = await api.patch(`http://localhost:8080/api/manager/codes/pluscode/delete/${code}`);
+            if (response.data) {
+                setMessage("기타 코드가 삭제되었습니다.");
+                await fetchCodes();
+            }
+        } catch (error) {
+            console.error('Error deleting plus code:', error);
+            setMessage("기타 코드 삭제에 실패했습니다.");
+        }
+    }
+};
+
 const resetForm = (formType) => {
     switch (formType) {
         case 'codeGroup':
@@ -285,6 +398,9 @@ const resetForm = (formType) => {
             break;
         case 'userStatus':
             newUserStatus.value = { code: '', codeExp: '', codeGroup: '', userStatus: '' };
+            break;
+        case 'plusCode':
+            newPlusCode.value = { codeGroup: '', code: null, codeExp: '', type: '' };
             break;
     }
 };
@@ -337,6 +453,12 @@ onUnmounted(() => {
                     :class="{ active: activeTab === 'userStatus' }">
                     사용자 상태
                 </button>
+                <button 
+                    @click="activeTab = 'plusCode'"
+                    :class="{ active: activeTab === 'plusCode' }"
+                >
+                    기타 코드
+                </button>
             </div>
 
             <!-- 코드 그룹 탭 -->
@@ -369,7 +491,7 @@ onUnmounted(() => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="code in sortedCodeTypes" :key="code.codeGroup">
+                                <tr v-for="code in paginatedCodeTypes" :key="code.codeGroup">
                                     <td>{{ code.codeGroup }}</td>
                                     <td>{{ code.groupExp }}</td>
                                     <td>
@@ -380,6 +502,27 @@ onUnmounted(() => {
                                 </tr>
                             </tbody>
                         </table>
+                        
+                        <!-- 페이지네이션 컨트롤 -->
+                        <div v-if="totalPages.codeTypes > 1" class="table-pagination">
+                            <button 
+                                class="page-btn"
+                                :disabled="currentPage.codeTypes === 1"
+                                @click="changePage('codeTypes', currentPage.codeTypes - 1)"
+                            >
+                                이전
+                            </button>
+                            <span class="page-info">
+                                {{ currentPage.codeTypes }} / {{ totalPages.codeTypes }}
+                            </span>
+                            <button 
+                                class="page-btn"
+                                :disabled="currentPage.codeTypes === totalPages.codeTypes"
+                                @click="changePage('codeTypes', currentPage.codeTypes + 1)"
+                            >
+                                다음
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -432,7 +575,7 @@ onUnmounted(() => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="code in sortedPetKindCodes" :key="code.code">
+                                <tr v-for="code in paginatedPetKindCodes" :key="code.code">
                                     <td>{{ code.code }}</td>
                                     <td>{{ code.codeExp }}</td>
                                     <td>{{ code.codeGroup }}</td>
@@ -445,6 +588,27 @@ onUnmounted(() => {
                                 </tr>
                             </tbody>
                         </table>
+                        
+                        <!-- 페이지네이션 컨트롤 -->
+                        <div v-if="totalPages.petKind > 1" class="table-pagination">
+                            <button 
+                                class="page-btn"
+                                :disabled="currentPage.petKind === 1"
+                                @click="changePage('petKind', currentPage.petKind - 1)"
+                            >
+                                이전
+                            </button>
+                            <span class="page-info">
+                                {{ currentPage.petKind }} / {{ totalPages.petKind }}
+                            </span>
+                            <button 
+                                class="page-btn"
+                                :disabled="currentPage.petKind === totalPages.petKind"
+                                @click="changePage('petKind', currentPage.petKind + 1)"
+                            >
+                                다음
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -497,7 +661,7 @@ onUnmounted(() => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="code in sortedPetSizeCodes" :key="code.code">
+                                <tr v-for="code in paginatedPetSizeCodes" :key="code.code">
                                     <td>{{ code.code }}</td>
                                     <td>{{ code.codeExp }}</td>
                                     <td>{{ code.codeGroup }}</td>
@@ -510,6 +674,27 @@ onUnmounted(() => {
                                 </tr>
                             </tbody>
                         </table>
+                        
+                        <!-- 페이지네이션 컨트롤 -->
+                        <div v-if="totalPages.petSize > 1" class="table-pagination">
+                            <button 
+                                class="page-btn"
+                                :disabled="currentPage.petSize === 1"
+                                @click="changePage('petSize', currentPage.petSize - 1)"
+                            >
+                                이전
+                            </button>
+                            <span class="page-info">
+                                {{ currentPage.petSize }} / {{ totalPages.petSize }}
+                            </span>
+                            <button 
+                                class="page-btn"
+                                :disabled="currentPage.petSize === totalPages.petSize"
+                                @click="changePage('petSize', currentPage.petSize + 1)"
+                            >
+                                다음
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -562,7 +747,7 @@ onUnmounted(() => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="code in sortedUserStatusCodes" :key="code.code">
+                                <tr v-for="code in paginatedUserStatusCodes" :key="code.code">
                                     <td>{{ code.code }}</td>
                                     <td>{{ code.codeExp }}</td>
                                     <td>{{ code.codeGroup }}</td>
@@ -575,6 +760,125 @@ onUnmounted(() => {
                                 </tr>
                             </tbody>
                         </table>
+                        
+                        <!-- 페이지네이션 컨트롤 -->
+                        <div v-if="totalPages.userStatus > 1" class="table-pagination">
+                            <button 
+                                class="page-btn"
+                                :disabled="currentPage.userStatus === 1"
+                                @click="changePage('userStatus', currentPage.userStatus - 1)"
+                            >
+                                이전
+                            </button>
+                            <span class="page-info">
+                                {{ currentPage.userStatus }} / {{ totalPages.userStatus }}
+                            </span>
+                            <button 
+                                class="page-btn"
+                                :disabled="currentPage.userStatus === totalPages.userStatus"
+                                @click="changePage('userStatus', currentPage.userStatus + 1)"
+                            >
+                                다음
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 기타 코드 탭 -->
+            <div v-if="activeTab === 'plusCode'" class="tab-content">
+                <div class="content-grid">
+                    <div class="form-section">
+                        <h2>기타 코드 추가</h2>
+                        <div class="form-group">
+                            <select 
+                                v-model="newPlusCode.codeGroup"
+                                class="input-field"
+                                required
+                            >
+                                <option value="">코드 그룹 선택</option>
+                                <option v-for="group in sortedCodeTypes" 
+                                        :key="group.codeGroup" 
+                                        :value="group.codeGroup">
+                                    {{ group.codeGroup }} ({{ group.groupExp }})
+                                </option>
+                            </select>
+
+                            <input 
+                                type="number"
+                                v-model="newPlusCode.code"
+                                placeholder="코드 번호"
+                                class="input-field"
+                                required
+                            />
+
+                            <input 
+                                type="text"
+                                v-model="newPlusCode.codeExp"
+                                placeholder="코드 설명"
+                                class="input-field"
+                                required
+                            />
+
+                            <input 
+                                type="text"
+                                v-model="newPlusCode.type"
+                                placeholder="코드 타입"
+                                class="input-field"
+                                required
+                            />
+
+                            <button @click="addPlusCode" class="submit-btn">추가</button>
+                        </div>
+                    </div>
+
+                    <div class="list-section">
+                        <h2>기타 코드 목록</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>코드</th>
+                                    <th>설명</th>
+                                    <th>코드 그룹</th>
+                                    <th>타입</th>
+                                    <th>작업</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="code in paginatedPlusCodes" :key="code.code">
+                                    <td>{{ code.code }}</td>
+                                    <td>{{ code.codeExp }}</td>
+                                    <td>{{ code.codeGroup }}</td>
+                                    <td>{{ code.type }}</td>
+                                    <td>
+                                        <button @click="deletePlusCode(code.code)" class="delete-btn">
+                                            삭제
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <!-- 페이지네이션 컨트롤 -->
+                        <div v-if="totalPages.plusCode > 1" class="table-pagination">
+                            <button 
+                                class="page-btn"
+                                :disabled="currentPage.plusCode === 1"
+                                @click="changePage('plusCode', currentPage.plusCode - 1)"
+                            >
+                                이전
+                            </button>
+                            <span class="page-info">
+                                {{ currentPage.plusCode }} / {{ totalPages.plusCode }}
+                            </span>
+                            <button 
+                                class="page-btn"
+                                :disabled="currentPage.plusCode === totalPages.plusCode"
+                                @click="changePage('plusCode', currentPage.plusCode + 1)"
+                            >
+                                다음
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -816,22 +1120,22 @@ select.input-field {
     color: #cc0000;
 }
 
-.delete-btn {
-    padding: 0.3rem 0.8rem;  /* 크기 줄임 */
-    background: transparent;  /* 배경 투명 */
-    color: #ff4444;  /* 글자색을 빨간색으로 */
-    border: 1px solid #ff4444;  /* 테두리 추가 */
-    border-radius: 4px;  /* 모서리 둥글기 줄임 */
+/* .delete-btn {
+    padding: 0.3rem 0.8rem;  
+    background: transparent; 
+    color: white;  
+    border: 1px solid #ff4444;  
+    border-radius: 4px;  
     cursor: pointer;
-    font-size: 0.65rem;  /* 글자 크기 줄임 */
+    font-size: 0.65rem; 
     transition: all 0.2s ease;
 }
 
 .delete-btn:hover {
-    background: #ff4444;  /* hover 시 배경색 변경 */
-    color: white;  /* hover 시 글자색 흰색으로 */
-    transform: translateY(-1px);  /* 살짝 위로 이동 */
-}
+    background: #ff4444; 
+    color: white; 
+    transform: translateY(-1px); 
+} */
 
 /* 테이블 셀 너비 조정 */
 td:last-child, th:last-child {
@@ -854,5 +1158,106 @@ td:last-child, th:last-child {
     background: #ffe6e6;
     color: #cc0000;
     font-weight: 500;
+}
+
+.code-list {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.code-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.code-info {
+    display: flex;
+    gap: 1rem;
+}
+
+.code-group, .code-number, .code-exp, .code-type {
+    color: #333;
+}
+
+.delete-btn {
+    padding: 0.4rem 0.8rem;
+    background: white;
+    color: black;
+    border: 1px solid #ff4444;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    font-size: 0.65rem;
+}
+
+.delete-btn:hover {
+    background: #ff4444;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem;
+}
+
+.page-btn {
+    padding: 0.5rem 1rem;
+    background: #5733FF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.page-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.page-btn:not(:disabled):hover {
+    background: #4529d3;
+}
+
+.page-info {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.table-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 0.5rem;
+}
+
+.page-btn {
+    padding: 0.4rem 0.8rem;
+    background: #5733FF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.page-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.page-info {
+    font-size: 0.9rem;
+    color: #666;
 }
 </style>
