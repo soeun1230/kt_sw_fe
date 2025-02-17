@@ -5,6 +5,8 @@ import { useRouter } from 'vue-router';
 import LogoutButton from '../components/LoginButton.vue';
 import NavBar from "@/components/NavBar.vue";
 
+import PaymentTest from "@/components/PaymentTest.vue";
+
 const router = useRouter();
 </script>
 
@@ -15,6 +17,7 @@ const router = useRouter();
 
   <div class="container">
     <!-- 페이지 컨텐츠 -->
+    <PaymentTest />
   </div>
 </template>
 

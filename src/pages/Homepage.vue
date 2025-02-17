@@ -3,6 +3,8 @@ import { useRouter } from 'vue-router';
 import LoginButton from '../components/LoginButton.vue';
 import RegisterButton from "../components/RegisterButton.vue";
 
+
+
 const router = useRouter();
 </script>
 
@@ -21,6 +23,9 @@ const router = useRouter();
         </button>
         <button class="register-btn" @click="() => router.push('/register')">
           <span class="btn-text">회원가입</span>
+        </button>
+        <button class="manager-btn" @click="() => router.push('/manager')">
+          <span class="btn-text">관리자 페이지</span>
         </button>
       </div>
     </div>
@@ -95,7 +100,7 @@ const router = useRouter();
   width: 100%;
 }
 
-.login-btn, .register-btn {
+.login-btn, .register-btn, .manager-btn {
   width: 100%;
   padding: 1rem;
   border: none;
@@ -113,13 +118,13 @@ const router = useRouter();
   color: white;
 }
 
-.register-btn {
+.register-btn, .manager-btn {
   background: white;
   color: #5733FF;
   border: 2px solid #5733FF;
 }
 
-.login-btn:hover, .register-btn:hover {
+.login-btn:hover, .register-btn:hover, .manager-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(87, 51, 255, 0.2);
 }
@@ -128,7 +133,7 @@ const router = useRouter();
   background: #4529d3;
 }
 
-.register-btn:hover {
+.register-btn:hover, .manager-btn:hover {
   background: #f8f9ff;
 }
 

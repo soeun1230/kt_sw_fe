@@ -45,6 +45,14 @@ const goToPetSitterPage = () => {
   router.push('/pet-sitter'); // 펫시터 페이지로 이동
 }
 
+const goToPetSitterServiceRegister = () => {
+  router.push('/pet-sitter-service-register');
+}
+
+const goToPetSitterServiceForUser = () => {
+  router.push('/pet-sitter-service-for-user');
+}
+
 onMounted(fetchUserCode);
 </script>
 
@@ -62,6 +70,9 @@ onMounted(fetchUserCode);
     <div class="nav-menu">
       <span class="menu-item" @click="goToDashboard">메인</span>
       <span class="menu-item" @click="goToMyPet">마이펫</span>
+      <span class="menu-item" @click="goToPetSitterServiceRegister">펫시터 서비스 신청</span>
+      <span class="menu-item" @click="goToPetSitterServiceForUser">펫시터 서비스 신청 목록</span>
+
       <!-- userCode에 따라 다른 버튼 표시 -->
       <span v-if="userCode === '0'" class="menu-item" @click="goToPetSitterRegister">펫시터 등록</span>
       <span v-else-if="userCode === '1'" class="menu-item" @click="goToPetSitterPage">펫시터 페이지</span>
