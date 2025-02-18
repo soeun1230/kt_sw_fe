@@ -11,6 +11,7 @@ import PetSitterServiceRegister from '@/pages/PetSitterServiceRegister.vue';
 import PetSitterServiceForUser from '@/pages/PetSitterServiceForUser.vue';
 import ManagerPage from '@/pages/ManagerPage.vue';
 import PetSitterServiceForPetSitter from '@/pages/PetSitterServiceForPetSitter.vue';
+import PaymentPage from '@/pages/PaymentPage.vue';
 
 const routes = [
     { path: '/', component: HomePage },
@@ -25,6 +26,7 @@ const routes = [
     { path: '/pet-sitter-service-for-user', component: PetSitterServiceForUser, meta: {requiresAuth: true} },
     { path: '/pet-sitter-service-for-pet-sitter', component: PetSitterServiceForPetSitter, meta: {requiresAuth: true} },
     { path: '/manager', component: ManagerPage },
+    { path: '/payment', component: PaymentPage, meta: {requiresAuth: true} },
 ];
 
 const router = createRouter({

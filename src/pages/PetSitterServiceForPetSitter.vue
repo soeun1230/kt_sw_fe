@@ -34,6 +34,20 @@ const approveService = async (serviceId) => {
     }
 };
 
+// 예약 거절 함수 추가
+const denyService = async (serviceId) => {
+    try {
+        const response = await api.get(`http://localhost:8080/api/petsitters/services/deny/${serviceId}`);
+        if (response.data.message === 'updated') {
+            alert('예약이 거절되었습니다.');
+            await fetchServices();
+        }
+    } catch (error) {
+        console.error('Error denying service:', error);
+        alert('예약 거절에 실패했습니다.');
+    }
+};
+
 onMounted(fetchServices);
 </script>
 
@@ -61,12 +75,20 @@ onMounted(fetchServices);
                             <p class="date">예약 날짜: {{ service.date }}</p>
                             <p class="pet-type">반려동물: {{ service.petKind }}</p>
                             <p class="cost">비용: {{ service.cost }}원</p>
-                            <button 
-                                class="approve-btn" 
-                                @click="approveService(service.serviceId)"
-                            >
-                                예약 승인하기
-                            </button>
+                            <div class="button-group">
+                                <button 
+                                    @click="approveService(service.serviceId)"
+                                    class="approve-btn"
+                                >
+                                    예약 승인하기
+                                </button>
+                                <button 
+                                    @click="denyService(service.serviceId)"
+                                    class="deny-btn"
+                                >
+                                    예약 거절하기
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -85,6 +107,9 @@ onMounted(fetchServices);
                             <p class="date">예약 날짜: {{ service.date }}</p>
                             <p class="pet-type">반려동물: {{ service.petKind }}</p>
                             <p class="cost">비용: {{ service.cost }}원</p>
+                            <div v-if="service.payment" class="payment-section">
+                                <p class="payment-complete">결제 완료된 예약입니다.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -228,23 +253,53 @@ onMounted(fetchServices);
     }
 }
 
-/* 승인 버튼 추가 스타일 */
-.approve-btn {
-    width: 100%;
-    padding: 0.8rem;
-    background: #5733FF;
+.payment-complete {
+    text-align: center;
     color: white;
-    border: none;
+    font-weight: 600;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background: #dd4b4b;
+    border-radius: 8px;
+}
+
+/* 승인 버튼 추가 스타일 */
+.button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.approve-btn, .deny-btn {
+    flex: 1;
+    padding: 0.8rem;
     border-radius: 8px;
     font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 1rem;
+}
+
+.approve-btn {
+    background: #5733FF;
+    color: white;
+    border: none;
 }
 
 .approve-btn:hover {
     background: #4529d3;
+    transform: translateY(-2px);
+}
+
+.deny-btn {
+    background: white;
+    color: #ff4444;
+    border: 1px solid #ff4444;
+}
+
+.deny-btn:hover {
+    background: #ff4444;
+    color: white;
     transform: translateY(-2px);
 }
 </style>

@@ -899,19 +899,6 @@ html, body, #app {
   overflow: hidden;
 }
 
-/* 헤더 스타일 */
-/* .page-header {
-  position: fixed; 
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 60px;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-  z-index: 1000; 
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-}  */
 
 .container {
     position: absolute;

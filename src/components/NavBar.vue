@@ -57,6 +57,10 @@ const goToPetSitterServiceForPetSitter = () => {
   router.push('/pet-sitter-service-for-pet-sitter');
 }
 
+const goToPayment = () => {
+  router.push('/payment');
+}
+
 onMounted(fetchUserCode);
 
 // userCode가 변경될 때마다 업데이트
@@ -81,6 +85,7 @@ onMounted(() => {
       <span class="menu-item" @click="goToMyPet">마이펫</span>
       <span class="menu-item" @click="goToPetSitterServiceRegister">펫시터 서비스 신청</span>
       <span class="menu-item" @click="goToPetSitterServiceForUser">펫시터 서비스 신청 목록</span>
+      <span class="menu-item" @click="goToPayment">결제 내역</span>
 
       <!-- userCode에 따라 다른 버튼 표시 -->
       <span v-if="userCode === '0'" class="menu-item" @click="goToPetSitterRegister">펫시터 등록</span>

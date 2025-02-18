@@ -116,13 +116,14 @@ const menuCards = computed(() => {
     color: #333;
     margin-bottom: 3rem;
     font-weight: 700;
+    text-align: left;
 }
 
 .menu-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(60px, 6fr));
     gap: 2rem;
-    padding: 1rem;
+    padding: 3rem;
 }
 
 .menu-card {
@@ -155,7 +156,7 @@ const menuCards = computed(() => {
     margin: 0;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .welcome-text {
         font-size: 2rem;
     }

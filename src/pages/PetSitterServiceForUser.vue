@@ -6,7 +6,8 @@ import api from "../axios.js";
 
 const services = ref({
     registered: [],
-    notRegistered: []
+    notRegistered: [],
+    denyRegistered: []
 });
 
 const fetchServices = async () => {
@@ -18,7 +19,8 @@ const fetchServices = async () => {
         if (response.data) {
             services.value = {
                 registered: response.data.registered || [],
-                notRegistered: response.data.notRegistered || []
+                notRegistered: response.data.notRegistered || [],
+                denyRegistered: response.data.denyRegistered || []
             };
         }
     } catch (error) {
@@ -37,6 +39,34 @@ const updatePaymentStatus = async (serviceId) => {
     } catch (error) {
         console.error('Payment status update failed:', error);
         alert('결제 상태 업데이트에 실패했습니다.');
+    }
+};
+
+// 서비스 취소 함수 추가
+const cancelService = async (serviceId) => {
+    try {
+        const response = await api.patch(`http://localhost:8080/api/services/delete/${serviceId}`);
+        if (response.data.message === 'deleted') {
+            alert('서비스가 취소되었습니다.');
+            await fetchServices(); // 목록 새로고침
+        }
+    } catch (error) {
+        console.error('Error canceling service:', error);
+        alert('서비스 취소에 실패했습니다.');
+    }
+};
+
+// 서비스 삭제 함수 추가
+const deleteService = async (serviceId) => {
+    try {
+        const response = await api.patch(`http://localhost:8080/api/services/delete/${serviceId}`);
+        if (response.data.message === 'deleted') {
+            alert('서비스가 삭제되었습니다.');
+            await fetchServices();
+        }
+    } catch (error) {
+        console.error('Error deleting service:', error);
+        alert('서비스 삭제에 실패했습니다.');
     }
 };
 
@@ -67,6 +97,12 @@ onMounted(fetchServices);
                             <p class="date">예약 날짜: {{ service.date }}</p>
                             <p class="pet-type">반려동물: {{ service.petKind }}</p>
                             <p class="cost">비용: {{ service.cost }}원</p>
+                            <button 
+                                @click="cancelService(service.serviceId)"
+                                class="cancel-btn"
+                            >
+                                예약 취소하기
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -85,7 +121,7 @@ onMounted(fetchServices);
                             <p class="date">예약 날짜: {{ service.date }}</p>
                             <p class="pet-type">반려동물: {{ service.petKind }}</p>
                             <p class="cost">비용: {{ service.cost }}원</p>
-                            <div v-if="!service.paymentStatus" class="payment-section">
+                            <div v-if="!service.payment" class="payment-section">
                                 <PaymentTest 
                                     :amount="service.cost"
                                     @payment-success="updatePaymentStatus(service.serviceId)" 
@@ -96,6 +132,33 @@ onMounted(fetchServices);
                     </div>
                 </div>
                 <p v-else class="no-service">확정된 예약이 없습니다.</p>
+            </div>
+
+            <!-- 거절된 서비스 섹션 추가 -->
+            <div class="service-section">
+                <h2>거절된 예약</h2>
+                <div class="service-grid" v-if="services.denyRegistered.length > 0">
+                    <div v-for="service in services.denyRegistered" 
+                         :key="service.serviceId" 
+                         class="service-card">
+                        <div class="service-info">
+                            <div class="status-container">
+                                <p class="status denied">예약 거절됨</p>
+                                <button 
+                                    @click="deleteService(service.serviceId)"
+                                    class="delete-btn"
+                                    title="서비스 삭제"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                            <p class="date">예약 날짜: {{ service.date }}</p>
+                            <p class="pet-type">반려동물: {{ service.petKind }}</p>
+                            <p class="cost">비용: {{ service.cost }}원</p>
+                        </div>
+                    </div>
+                </div>
+                <p v-else class="no-service">거절된 예약이 없습니다.</p>
             </div>
         </div>
     </div>
@@ -204,6 +267,11 @@ onMounted(fetchServices);
     color: #4caf50;
 }
 
+.status.denied {
+    background: #ffebee;
+    color: #d32f2f;
+}
+
 .date, .pet-type {
     color: #666;
 }
@@ -236,6 +304,48 @@ onMounted(fetchServices);
     border-radius: 8px;
 }
 
+.cancel-btn {
+    width: 100%;
+    padding: 0.8rem;
+    background: white;
+    color: #ff4444;
+    border: 1px solid #ff4444;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.cancel-btn:hover {
+    background: #ff4444;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.status-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.delete-btn:hover {
+    color: #ff4444;
+    transform: scale(1.1);
+}
+
 @media (max-width: 768px) {
     .form-container {
         padding: 2rem;
@@ -247,6 +357,15 @@ onMounted(fetchServices);
 
     .service-grid {
         grid-template-columns: 1fr;
+    }
+
+    .status-container {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    .delete-btn {
+        padding: 0.5rem;
     }
 }
 </style>
